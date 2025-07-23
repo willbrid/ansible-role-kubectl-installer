@@ -26,3 +26,7 @@
   ansible.builtin.debug:
     msg: "kubectl is already installed with the correct version : {{ kubectl_derived_version }}"
   when: kubectl_already_installed
+
+- name: Install kubectl
+  ansible.builtin.include_tasks: "install-kubectl.yml"
+  when: not kubectl_already_installed
