@@ -1,0 +1,11 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: true
+  vars:
+    kubectl_version: "v3.17.3"
+
+  tasks:
+    - name: Include willbrid.kubectl_installer
+      ansible.builtin.include_role:
+        name: "willbrid.kubectl_installer"
