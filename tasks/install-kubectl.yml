@@ -1,0 +1,30 @@
+---
+- name: Set kubectl download url
+  ansible.builtin.set_fact:
+    kubectl_download_url: "{{ kubectl_download_base_url }}/{{ kubectl_derived_version }}/bin/linux/{{ host_architecture }}/{{ kubectl_binary_filename }}"
+
+- name: Download kubectl binary file in /tmp dir
+  ansible.builtin.get_url:
+    url: "{{ kubectl_download_url }}"
+    dest: "/tmp/{{ kubectl_binary_filename }}"
+    mode: 0755
+
+- name: Verify checksum for kubectl binary file
+  when: should_verify_kubectl_checksum
+  block:
+    - name: Download kubectl binary file checksum in /tmp dir
+      ansible.builtin.get_url:
+        url: "{{ kubectl_download_url }}.sha256"
+        dest: "/tmp/{{ kubectl_binary_filename }}.sha256"
+        mode: 0755
+
+    - name: Verify kubectl binary file checksum
+      ansible.builtin.shell: cd /tmp && echo "$(cat {{ kubectl_binary_filename }}.sha256)  {{ kubectl_binary_filename }}" | sha256sum --check
+      register: kubectl_checksum_result
+      changed_when: false
+
+    - name: Check if kubectl binary file checksum is correct
+      ansible.builtin.assert:
+        that:
+          - kubectl_checksum_result.stdout is defined and kubectl_checksum_result.stdout is ansible.builtin.search("OK")
+        fail_msg: "the kubectl binary checksum is not correct"
