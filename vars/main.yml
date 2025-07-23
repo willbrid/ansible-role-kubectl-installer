@@ -1,3 +1,6 @@
 ---
+host_architecture: "{{ 'amd64' if ansible_architecture == 'x86_64' else ansible_architecture }}"
 kubectl_derived_version: "{{ kubectl_version }}"
-kubectl_stable_version_url: "https://dl.k8s.io/release/stable.txt"
+kubectl_download_base_url: "https://dl.k8s.io/release"
+kubectl_stable_version_url: "{{ kubectl_download_base_url }}/stable.txt"
+kubectl_binary_filename: "kubectl"
