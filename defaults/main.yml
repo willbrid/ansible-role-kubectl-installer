@@ -1,0 +1,3 @@
+---
+kubectl_version: "stable"
+should_verify_kubectl_checksum: true
