@@ -3,7 +3,7 @@
   hosts: all
   gather_facts: true
   vars:
-    kubectl_version: "v3.17.3"
+    should_verify_kubectl_checksum: true
 
   tasks:
     - name: Include willbrid.kubectl_installer
