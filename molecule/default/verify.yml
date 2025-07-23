@@ -1,0 +1,39 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: true
+  vars:
+    kubectl_bin_dir: "/usr/local/bin"
+    kubectl_specific_version: "v1.33.0"
+    kubectl_stable_version_url: "https://dl.k8s.io/release/stable.txt"
+
+  tasks:
+    - name: Get kubectl binary version
+      ansible.builtin.command: "{{ kubectl_bin_dir }}/kubectl version --client=true"
+      register: kubectl_version_result
+      changed_when: false
+
+    - name: Check kubectl correct version
+      ansible.builtin.assert:
+        that:
+          - kubectl_version_result.rc == 0
+
+    - name: Verify instance-1
+      when: inventory_hostname == "instance-1"
+      block:
+        - name: Retreive the specific kubectl stable version [instance-1]
+          ansible.builtin.uri:
+            url: "{{ kubectl_stable_version_url }}"
+            return_content: true
+            status_code: 200
+          register: kubectl_stable_version_response
+        - name: Verify kubectl stable version is installed [instance-1]
+          ansible.builtin.assert:
+            that:
+              - kubectl_version_result.stdout is ansible.builtin.search(kubectl_stable_version_response.content)
+
+    - name: Verify that kubectl specific version is installed [instance-2]
+      ansible.builtin.assert:
+        that:
+          - kubectl_version_result.stdout is ansible.builtin.search(kubectl_specific_version)
+      when: inventory_hostname == "instance-2"
