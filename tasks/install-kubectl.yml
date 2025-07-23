@@ -28,3 +28,22 @@
         that:
           - kubectl_checksum_result.stdout is defined and kubectl_checksum_result.stdout is ansible.builtin.search("OK")
         fail_msg: "the kubectl binary checksum is not correct"
+
+- name: Copy kubectl binary file to bin dir
+  ansible.builtin.copy:
+    src: "/tmp/{{ kubectl_binary_filename }}"
+    dest: "{{ kubectl_bin_dir }}/{{ kubectl_binary_filename }}"
+    mode: 0755
+    owner: root
+    group: root
+    remote_src: true
+
+- name: Find files in /tmp starting with kubectl
+  ansible.builtin.find:
+    paths: "/tmp"
+    patterns: "^kubectl.*"
+    use_regex: true
+    file_type: file
+  register: kubectl_installation_items_to_delete
+  notify: Cleanup all kubectl installation items
+  changed_when: true
