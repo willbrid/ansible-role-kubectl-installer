@@ -1,0 +1,20 @@
+---
+argument_specs:
+  main:
+    short_description: "Install kubectl for Linux"
+    description:
+      - "Install kubectl for RedHat and Debian distros"
+    author: "WillBrid"
+    options:
+      kubectl_version:
+        type: str
+        required: false
+        default: "stable"
+        description:
+          - "kubectl version"
+      should_verify_kubectl_checksum:
+        type: bool
+        required: false
+        default: true
+        description:
+          - "whether to verify kubectl binary file checksum"
