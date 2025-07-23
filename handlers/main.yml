@@ -1,0 +1,6 @@
+---
+- name: Cleanup all kubectl installation items
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ kubectl_installation_items_to_delete.files }}"
